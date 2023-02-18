@@ -15,24 +15,28 @@ namespace RevitAPITrainingCreateModel
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             Document doc = commandData.Application.ActiveUIDocument.Document;
-            List<Wall> walls = CreateWalls(doc, 10000, 5000);
+
+            List<Wall> walls = CreateWalls(doc, 10000, 5000, GetLevel(doc, "Уровень 1"), GetLevel(doc, "Уровень 2"));
+
             return Result.Succeeded;
         }
 
-        public List<Wall> CreateWalls(Document doc, double widthInput, double depthInput)
+        public Level GetLevel(Document doc, string inputString)
         {
             List<Level> listLevel = new FilteredElementCollector(doc)
                                     .OfClass(typeof(Level))
                                     .OfType<Level>()
                                     .ToList();
 
-            Level level1 = listLevel
-               .Where(x => x.Name.Equals("Уровень 1"))
+            Level level = listLevel
+               .Where(x => x.Name.Equals(inputString))
                .FirstOrDefault();
 
-            Level level2 = listLevel
-               .Where(x => x.Name.Equals("Уровень 2"))
-               .FirstOrDefault();
+            return level;
+        }
+
+        public List<Wall> CreateWalls(Document doc, double widthInput, double depthInput, Level level1, Level level2)
+        {
 
             double width = UnitUtils.ConvertToInternalUnits(widthInput, UnitTypeId.Millimeters);
             double depth = UnitUtils.ConvertToInternalUnits(depthInput, UnitTypeId.Millimeters);
